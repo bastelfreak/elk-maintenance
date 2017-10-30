@@ -7,6 +7,7 @@
 # Some API docs at:
 # .vendor/ruby/2.4.0/gems/elasticsearch-api-5.0.4/lib/elasticsearch/api/actions/reindex.rb
 # http://dry-rb.org/gems/dry-types/
+# http://dry-rb.org/gems/dry-types/default-values/
 # https://github.com/elastic/elasticsearch-ruby/issues/319
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-reindex.html
 # http://www.rubydoc.info/gems/elasticsearch-api/Elasticsearch/API/Indices/Actions
