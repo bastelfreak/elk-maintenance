@@ -24,7 +24,7 @@ end
 
 class Maintenance < Dry::Struct
   attribute :source, Types::Strict::String
-  attribute :destination, Types::Strict::String.default{"#{source}.new"}
+  attribute :destination, Types::Strict::String
   attribute :url, Types::Strict::String.default('http://localhost:9200')
 
   def client(force: nil)
@@ -40,7 +40,7 @@ class Maintenance < Dry::Struct
     exit unless client.cluster.health['status'] == 'green'
     client.indices.create index: destination
     wait_for_cluster
-    @task_id = client.reindex(body: { source: { index: source, size: 5000 }, dest: { index: destination } }, refresh: true, wait_for_completion: false)['task']
+    @task_id = client.reindex(body: { source: { index: source, size: 10000 }, dest: { index: destination } }, refresh: true, wait_for_completion: false)['task']
   end
 
   def wait_for_cluster
@@ -69,7 +69,8 @@ class Maintenance < Dry::Struct
   end
 end
 
-# example
-m = Maintenance.new(source: 'filebeat-2017.08.09', destination: 'filebeat-2017.08.09.new', url: 'http://localhost:9200')
+# example to migrate a single index
+index = 'filebeat-2017.08.12'
+m = Maintenance.new(source: index, destination: "#{index}.new", url: nil)
 m.recreate_index
 m.cleanup
