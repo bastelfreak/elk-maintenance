@@ -13,9 +13,13 @@
 # http://www.rubydoc.info/gems/elasticsearch-api/Elasticsearch/API/Indices/Actions
 ##
 
+# main lib to interact with elasticsearch
 require 'elasticsearch'
+# provide safe types
 require 'dry-types'
 require 'dry-struct'
+# for CLI support
+require 'optparse'
 
 module Types
   include Dry::Types.module
@@ -66,6 +70,35 @@ class Maintenance < Dry::Struct
     puts "delete index #{source} in 30s"
     sleep 30
     client.indices.delete index: source
+  end
+
+  def template_settings
+    client.cluster.state['metadata']['templates']['filebeat']['settings']['index']
+  end
+
+  def template_number_of_shards
+    settings = template_settings
+    settings['number_of_shards'].to_i
+  end
+
+  def template_number_of_replicas
+    settings = template_settings
+    settings['number_of_replicas'].to_i
+  end
+
+  def index_settings(index)
+    result = client.indices.get index: index
+    result[index]['settings']['index']
+  end
+
+  def index_number_of_shards(index)
+    settings = index_settings(index)
+    settings['number_of_shards']
+  end
+
+  def index_number_of_replicas
+    settings = index_settings(index)
+    settings['number_of_replicas']
   end
 end
 
