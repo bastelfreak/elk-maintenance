@@ -2,6 +2,7 @@
 
 ##
 # created by Tim Meusel
+# with suggestions from Joakim Reinert
 ##
 # Some API docs at:
 # .vendor/ruby/2.4.0/gems/elasticsearch-api-5.0.4/lib/elasticsearch/api/actions/reindex.rb
@@ -17,16 +18,13 @@ require 'dry-struct'
 
 module Types
   include Dry::Types.module
+  #URI = Instance(::URI).constructor { |value| ::URI(value) }
 end
 
 class Maintenance < Dry::Struct
   attribute :source, Types::Strict::String
   attribute :destination, Types::Strict::String
-
-  def url(force: nil)
-    @url = nil if force
-    @url ||= 'http://localhost:9200'
-  end
+  attribute :url, Types::Strict::String.default('http://localhost:9200')
 
   def client(force: nil)
     @client = nil if force
