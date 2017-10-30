@@ -17,3 +17,21 @@ until false
   sleep 10
 end
 ```
+
+## Infos about a node
+
+```ruby
+puts client.cluster.stats
+```
+
+## Stats about nodes
+
+```ruby
+client.nodes.stats
+```
+
+## Infos about nodes
+
+```ruby
+client.nodes.infos
+```
