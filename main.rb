@@ -24,7 +24,7 @@ end
 
 class Maintenance < Dry::Struct
   attribute :source, Types::Strict::String
-  attribute :destination, Types::Strict::String
+  attribute :destination, Types::Strict::String.default{"#{source}.new"}
   attribute :url, Types::Strict::String.default('http://localhost:9200')
 
   def client(force: nil)
