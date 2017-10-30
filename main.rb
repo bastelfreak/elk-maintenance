@@ -41,7 +41,7 @@ class Maintenance < Dry::Struct
     exit unless client.cluster.health['status'] == 'green'
     client.indices.create index: destination
     wait_for_cluster
-    @task_id = client.reindex(body: { source: { index: source }, dest: { index: destination } }, refresh: true, wait_for_completion: false)['task']
+    @task_id = client.reindex(body: { source: { index: source, size: 5000 }, dest: { index: destination } }, refresh: true, wait_for_completion: false)['task']
   end
 
   def wait_for_cluster
