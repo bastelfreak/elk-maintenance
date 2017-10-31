@@ -69,7 +69,7 @@ class Maintenance < Dry::Struct
   def cleanup
     wait_for_task if @task_id
     puts "Set replicas for #{destination} from #{index_number_of_shards(destination)} to #{template_number_of_replicas}"
-    response = set_correct_replicas(destination)
+    response = correct_replicas(destination)
     if response
       puts 'successfully modified replica'
       wait_for_cluster
@@ -121,7 +121,7 @@ class Maintenance < Dry::Struct
     response['acknowledged']
   end
 
-  def set_correct_replicas(index)
+  def correct_replicas(index)
     response = client.indices.put_settings index: index, body: { index: { number_of_replicas: template_number_of_replicas } }
     response['acknowledged']
   end
