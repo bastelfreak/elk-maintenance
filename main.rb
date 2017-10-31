@@ -11,6 +11,7 @@
 # https://github.com/elastic/elasticsearch-ruby/issues/319
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-reindex.html
 # http://www.rubydoc.info/gems/elasticsearch-api/Elasticsearch/API/Indices/Actions
+# https://github.com/elastic/elasticsearch-ruby/blob/master/elasticsearch-api/lib/elasticsearch/api/actions/indices/put_settings.rb
 ##
 
 # main lib to interact with elasticsearch
@@ -66,7 +67,9 @@ class Maintenance < Dry::Struct
   end
 
   def cleanup
-    wait_for_task
+    wait_for_task if $task_id
+    puts "Set replicas for #{destination} from #{index_number_of_shards(destination)} to #{template_number_of_replicas}"
+    set_correct_replicas(destination)
     puts "delete index #{source} in 30s"
     sleep 30
     client.indices.delete index: source
@@ -99,6 +102,22 @@ class Maintenance < Dry::Struct
   def index_number_of_replicas
     settings = index_settings(index)
     settings['number_of_replicas']
+  end
+
+  def set_replicas(index, replicas)
+    response = client.indices.put_settings index: index, body: {index: { number_of_replicas: replicas }}
+    # {"acknowledged"=>true}
+    response['acknowledged']
+  end
+
+  def drop_replicas(index)
+    response = client.indices.put_settings index: index, body: {index: { number_of_replicas: 0 }}
+    response['acknowledged']
+  end
+
+  def set_correct_replicas(index)
+    response = client.indices.put_settings index: index, body: {index: { number_of_replicas: template_number_of_replicas }}
+    response['acknowledged']
   end
 end
 
