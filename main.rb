@@ -44,6 +44,7 @@ class Maintenance < Dry::Struct
   def recreate_index
     exit unless client.cluster.health['status'] == 'green'
     client.indices.create index: destination
+    drop_replicas(destination)
     wait_for_cluster
     @task_id = client.reindex(body: { source: { index: source, size: 10_000 }, dest: { index: destination } }, refresh: true, wait_for_completion: false)['task']
   end
