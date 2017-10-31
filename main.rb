@@ -24,7 +24,7 @@ require 'optparse'
 
 module Types
   include Dry::Types.module
-  #URI = Instance(::URI).constructor { |value| ::URI(value) }
+  # URI = Instance(::URI).constructor { |value| ::URI(value) }
 end
 
 class Maintenance < Dry::Struct
@@ -45,7 +45,7 @@ class Maintenance < Dry::Struct
     exit unless client.cluster.health['status'] == 'green'
     client.indices.create index: destination
     wait_for_cluster
-    @task_id = client.reindex(body: { source: { index: source, size: 10000 }, dest: { index: destination } }, refresh: true, wait_for_completion: false)['task']
+    @task_id = client.reindex(body: { source: { index: source, size: 10_000 }, dest: { index: destination } }, refresh: true, wait_for_completion: false)['task']
   end
 
   def wait_for_cluster
@@ -67,11 +67,11 @@ class Maintenance < Dry::Struct
   end
 
   def cleanup
-    wait_for_task if $task_id
+    wait_for_task if task_id
     puts "Set replicas for #{destination} from #{index_number_of_shards(destination)} to #{template_number_of_replicas}"
     response = set_correct_replicas(destination)
     if response
-      puts "successfully modified replica"
+      puts 'successfully modified replica'
       wait_for_cluster
       puts "delete index #{source} in 30s"
       sleep 30
@@ -111,18 +111,18 @@ class Maintenance < Dry::Struct
   end
 
   def set_replicas(index, replicas)
-    response = client.indices.put_settings index: index, body: {index: { number_of_replicas: replicas }}
+    response = client.indices.put_settings index: index, body: { index: { number_of_replicas: replicas } }
     # {"acknowledged"=>true}
     response['acknowledged']
   end
 
   def drop_replicas(index)
-    response = client.indices.put_settings index: index, body: {index: { number_of_replicas: 0 }}
+    response = client.indices.put_settings index: index, body: { index: { number_of_replicas: 0 } }
     response['acknowledged']
   end
 
   def set_correct_replicas(index)
-    response = client.indices.put_settings index: index, body: {index: { number_of_replicas: template_number_of_replicas }}
+    response = client.indices.put_settings index: index, body: { index: { number_of_replicas: template_number_of_replicas } }
     response['acknowledged']
   end
 end
