@@ -67,7 +67,7 @@ class Maintenance < Dry::Struct
   end
 
   def cleanup
-    wait_for_task if task_id
+    wait_for_task if @task_id
     puts "Set replicas for #{destination} from #{index_number_of_shards(destination)} to #{template_number_of_replicas}"
     response = set_correct_replicas(destination)
     if response
