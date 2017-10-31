@@ -69,10 +69,16 @@ class Maintenance < Dry::Struct
   def cleanup
     wait_for_task if $task_id
     puts "Set replicas for #{destination} from #{index_number_of_shards(destination)} to #{template_number_of_replicas}"
-    set_correct_replicas(destination)
-    puts "delete index #{source} in 30s"
-    sleep 30
-    client.indices.delete index: source
+    response = set_correct_replicas(destination)
+    if response
+      puts "successfully modified replica"
+      wait_for_cluster
+      puts "delete index #{source} in 30s"
+      sleep 30
+      client.indices.delete index: source
+    else
+      puts "setting replicas failed, we got: #{response}"
+    end
   end
 
   def template_settings
