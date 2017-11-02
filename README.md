@@ -9,6 +9,7 @@ bundle install --path .vendor/
 ## Count docs
 
 ```ruby
+client = Elasticsearch::Client.new
 docs = client.cluster.stats['indices']['docs']['count']
 until false
   docs2 = client.cluster.stats['indices']['docs']['count']
@@ -18,6 +19,18 @@ until false
 end
 ```
 
+Or in more beautiful:
+
+```ruby
+client = Elasticsearch::Client.new
+a = client.cluster.stats.dig("indices","docs","count")
+loop do
+  sleep 1
+  x = client.cluster.stats.dig("indices","docs","count")
+  print "\r#{x-a}  "
+  a = x
+end
+```
 ## Infos about a node
 
 ```ruby
